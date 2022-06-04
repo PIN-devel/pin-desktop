@@ -1,50 +1,52 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
-import './App.css';
+import { Routes, Route, NavLink } from 'react-router-dom';
 
-const Hello = () => {
-  return (
-    <div>
-      <div className="Hello">
-        <img width="200px" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
-    </div>
-  );
-};
+import {
+  Container,
+  Divider,
+  Grid,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+} from '@mui/material';
+
+import TodoListTab from './Tabs/TodoListTab/TodoListTab';
+import DummyTab from './Tabs/DummyTab';
 
 export default function App() {
+  const tabs = [
+    { name: 'To-do List', path: '/' },
+    { name: 'Example1', path: '/dd' },
+    { name: 'Example2', path: '/dd' },
+  ];
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
+    <Container
+      fixed
+      style={{ margin: 0, padding: 0, width: '100%', height: '100%' }}
+    >
+      <Grid container>
+        <Grid item xs={3}>
+          <List>
+            {tabs.map((tab) => (
+              <>
+                <ListItem disablePadding>
+                  <ListItemButton component={NavLink} to={tab.path}>
+                    <ListItemText primary={tab.name} />
+                  </ListItemButton>
+                </ListItem>
+                <Divider />
+              </>
+            ))}
+          </List>
+        </Grid>
+
+        <Grid item xs={9}>
+          <Routes>
+            <Route index element={<TodoListTab />} />
+            <Route path="dd" element={<DummyTab />} />
+          </Routes>
+        </Grid>
+      </Grid>
+    </Container>
   );
 }
