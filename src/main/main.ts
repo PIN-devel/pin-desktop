@@ -8,6 +8,7 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
+import fs from 'fs';
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
@@ -29,6 +30,18 @@ ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+ipcMain.on('update-save', async (event, arg) => {
+  const strArg = JSON.stringify(arg);
+  fs.writeFileSync('save.json', JSON.stringify(strArg));
+  event.reply('update-save', `save updated: ${strArg}`);
+});
+
+ipcMain.on('read-save', async (event) => {
+  // console.log('###########');
+  // console.log(JSON.parse(fs.readFileSync('save.json', 'utf8')));
+  event.reply('read-save', fs.readFileSync('save.json', 'utf8'));
 });
 
 if (process.env.NODE_ENV === 'production') {

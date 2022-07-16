@@ -19,6 +19,18 @@ export default function App() {
     { name: 'Example1', path: '/dd' },
     { name: 'Example2', path: '/dd' },
   ];
+  const test = () => {
+    console.log('test');
+    window.electron.ipcRenderer.once('update-save', (result) => {
+      console.log(result);
+    });
+    window.electron.ipcRenderer.updateSave([
+      { id: 1, text: '할일1', state: 0 },
+      { id: 2, text: '할일2', state: 1 },
+      { id: 3, text: '할일3', state: 0 },
+    ]);
+  };
+
   return (
     <Grid container>
       <Grid item xs={gridRatio[0]}>
@@ -33,6 +45,14 @@ export default function App() {
               <Divider />
             </Fragment>
           ))}
+
+          {/* test */}
+          <ListItem disablePadding>
+            <ListItemButton onClick={test}>
+              <ListItemText primary="test" />
+            </ListItemButton>
+          </ListItem>
+          {/* test end */}
         </List>
       </Grid>
 

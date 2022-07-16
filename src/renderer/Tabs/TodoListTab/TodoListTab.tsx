@@ -1,15 +1,7 @@
-import { useState } from 'react';
-import {
-  Grid,
-  Card,
-  CardHeader,
-  CardActions,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-} from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Grid } from '@mui/material';
 
-import TodoListCard from './TodoListCard';
+import { TodoListCard, ITodo } from './TodoListCard';
 
 export default function TodoListTab() {
   const cardStateList = [
@@ -17,11 +9,22 @@ export default function TodoListTab() {
     { code: 1, title: 'Doing' },
     { code: 2, title: 'Done' },
   ];
-  const [todoList, setTodoList] = useState([
-    { id: 1, text: '할일1', state: 0 },
-    { id: 2, text: '할일2', state: 1 },
-    { id: 3, text: '할일3', state: 0 },
-  ]);
+  const [todoList, setTodoList] = useState<ITodo[]>([]);
+  useEffect(() => {
+    window.electron.ipcRenderer.once('read-save', (result: any) => {
+      setTodoList(JSON.parse(JSON.parse(result)));
+    });
+    window.electron.ipcRenderer.readSave();
+  }, []);
+
+  useEffect(() => {
+    if (todoList.length) {
+      window.electron.ipcRenderer.once('update-save', (result) => {
+        console.log(result);
+      });
+      window.electron.ipcRenderer.updateSave(todoList);
+    }
+  }, [todoList]);
 
   return (
     <Grid container spacing={0.5}>

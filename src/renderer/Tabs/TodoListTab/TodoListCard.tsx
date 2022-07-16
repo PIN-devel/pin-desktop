@@ -8,7 +8,7 @@ import {
   FormGroup,
 } from '@mui/material';
 
-interface ITodo {
+export interface ITodo {
   id: number;
   text: string;
   state: number;
@@ -25,11 +25,7 @@ interface IProps {
   cardState: ICardState;
 }
 
-export default function TodoListCard({
-  todoList,
-  setTodoList,
-  cardState,
-}: IProps) {
+export function TodoListCard({ todoList, setTodoList, cardState }: IProps) {
   const handleChange = (id: number) => {
     setTodoList(
       todoList.map((todo) =>
