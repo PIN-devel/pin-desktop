@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import {
   Card,
   CardActions,
@@ -8,53 +8,61 @@ import {
   FormGroup,
 } from '@mui/material';
 
-export interface ITodo {
-  id: number;
-  text: string;
-  state: number;
-}
-
-interface ICardState {
-  code: number;
-  title: string;
-}
+import { ITodo } from 'renderer/Interface/todoInterface';
+import { ContentPasteOffSharp } from '@mui/icons-material';
 
 interface IProps {
-  todoList: ITodo[];
-  setTodoList: Dispatch<SetStateAction<ITodo[]>>;
-  cardState: ICardState;
+  cardData: ITodo[];
+  title: string;
+  setUpdateData: Dispatch<SetStateAction<ITodo>>;
+  // cardState: ICardState;
 }
 
-export function TodoListCard({ todoList, setTodoList, cardState }: IProps) {
-  const handleChange = (id: number) => {
-    setTodoList(
-      todoList.map((todo) =>
-        todo.id === id ? { ...todo, state: todo.state + 1 } : todo
-      )
-    );
+export default function TodoListCard({
+  cardData,
+  title,
+  setUpdateData,
+}: IProps) {
+  const updateState = (state: string) => {
+    if (state === 'todo') {
+      return 'doing';
+    }
+    return 'done';
   };
+  const handleChange = (data: ITodo) => {
+    console.log('change');
+    console.log(data);
+    // setCardData(
+    //   cardData.map((data, id) =>
+    //     id === idx ? { ...data, state: updateState(data.state) } : data
+    //   )
+    // );
+    setUpdateData({ ...data, state: updateState(data.state) });
+  };
+  // useEffect(() => {
+  //   console.log(title);
+  //   console.log(cardData);
+  // }, [cardData]);
 
   return (
     <Card>
-      <CardHeader title={cardState.title} />
+      <CardHeader title={title} />
       <CardActions>
         <FormGroup>
-          {todoList.map(
-            (todo) =>
-              todo.state === cardState.code && (
-                <FormControlLabel
-                  key={todo.id}
-                  control={
-                    <Checkbox
-                      onChange={() => {
-                        handleChange(todo.id);
-                      }}
-                    />
-                  }
-                  label={todo.text}
-                />
-              )
-          )}
+          {!!cardData.length &&
+            cardData.map((data) => (
+              <FormControlLabel
+                key={data.id}
+                control={
+                  <Checkbox
+                    onChange={() => {
+                      handleChange(data);
+                    }}
+                  />
+                }
+                label={data.task}
+              />
+            ))}
         </FormGroup>
       </CardActions>
     </Card>

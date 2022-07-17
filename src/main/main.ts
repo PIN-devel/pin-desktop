@@ -34,7 +34,8 @@ ipcMain.on('ipc-example', async (event, arg) => {
 
 ipcMain.on('update-save', async (event, arg) => {
   const strArg = JSON.stringify(arg);
-  fs.writeFileSync('save.json', JSON.stringify(strArg));
+  console.log(strArg);
+  fs.writeFileSync('save.json', strArg);
   event.reply('update-save', `save updated: ${strArg}`);
 });
 
