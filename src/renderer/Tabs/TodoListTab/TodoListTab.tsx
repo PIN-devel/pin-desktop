@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
-import { Grid } from '@mui/material';
+import { useCallback, useEffect, useState } from 'react';
+
+import { Grid, Fab } from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 
 import { ITodo } from 'renderer/Interface/todoInterface';
 
 import TodoListCard from 'renderer/Tabs/TodoListTab/TodoListCard';
+import TodoListInput from './TodoListInput';
 
 export default function TodoListTab() {
   const [todoData, setTodoData] = useState<{ [key: string]: ITodo }>({});
@@ -14,16 +17,31 @@ export default function TodoListTab() {
 
   const [updateData, setUpdateData] = useState<ITodo>({});
 
+  const [open, setOpen] = useState<boolean>(false);
+  const openModal = () => setOpen(true);
+  const closeModal = () => setOpen(false);
+
+  const handleKeyPress = useCallback((e) => {
+    // console.log(e.key);
+    if (e.key === ' ') {
+      openModal();
+    }
+  }, []);
+
   useEffect(() => {
     window.electron.ipcRenderer.once('read-save', (result: any) => {
-      // console.log(result);
-      // console.log(JSON.parse(result));
-      // console.log(JSON.parse(JSON.parse(result)));
-      // setTodoData(JSON.parse(result));
       setTodoData(JSON.parse(result));
     });
     window.electron.ipcRenderer.readSave();
   }, []);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyPress);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [handleKeyPress]);
 
   useEffect(() => {
     console.log(todoData);
@@ -59,13 +77,27 @@ export default function TodoListTab() {
     }
   }, [updateData]);
 
+  const deleteTodo = (id) => {
+    setTodoData((prev) => {
+      const tmp = { ...prev };
+      delete tmp[id];
+      return tmp;
+    });
+  };
+
   return (
     <Grid container spacing={0.5}>
+      <Grid item xs={12}>
+        <Fab color="primary" aria-label="add" size="small" onClick={openModal}>
+          <AddIcon />
+        </Fab>
+      </Grid>
       <Grid item xs>
         <TodoListCard
           cardData={todoList}
           title="Todo"
           setUpdateData={setUpdateData}
+          deleteTodo={deleteTodo}
         />
       </Grid>
       <Grid item xs>
@@ -73,6 +105,7 @@ export default function TodoListTab() {
           cardData={doingList}
           title="Doing"
           setUpdateData={setUpdateData}
+          deleteTodo={deleteTodo}
         />
       </Grid>
       <Grid item xs>
@@ -80,8 +113,14 @@ export default function TodoListTab() {
           cardData={doneList}
           title="Done"
           setUpdateData={setUpdateData}
+          deleteTodo={deleteTodo}
         />
       </Grid>
+      <TodoListInput
+        open={open}
+        handleClose={closeModal}
+        setUpdateData={setUpdateData}
+      />
     </Grid>
   );
 }

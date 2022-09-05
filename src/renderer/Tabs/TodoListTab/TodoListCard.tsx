@@ -3,18 +3,18 @@ import {
   Card,
   CardActions,
   CardHeader,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
+  List,
+  ListItem,
+  ListItemText,
 } from '@mui/material';
 
 import { ITodo } from 'renderer/Interface/todoInterface';
-import { ContentPasteOffSharp } from '@mui/icons-material';
 
 interface IProps {
   cardData: ITodo[];
   title: string;
   setUpdateData: Dispatch<SetStateAction<ITodo>>;
+  deleteTodo: (id: string) => void;
   // cardState: ICardState;
 }
 
@@ -22,6 +22,7 @@ export default function TodoListCard({
   cardData,
   title,
   setUpdateData,
+  deleteTodo,
 }: IProps) {
   const updateState = (state: string) => {
     if (state === 'todo') {
@@ -29,41 +30,46 @@ export default function TodoListCard({
     }
     return 'done';
   };
-  const handleChange = (data: ITodo) => {
-    console.log('change');
+
+  const undoState = (state: string) => {
+    if (state === 'done') {
+      return 'doing';
+    }
+    return 'todo';
+  };
+
+  const handleClick = (data) => {
     console.log(data);
-    // setCardData(
-    //   cardData.map((data, id) =>
-    //     id === idx ? { ...data, state: updateState(data.state) } : data
-    //   )
-    // );
     setUpdateData({ ...data, state: updateState(data.state) });
   };
-  // useEffect(() => {
-  //   console.log(title);
-  //   console.log(cardData);
-  // }, [cardData]);
+
+  const handleRightClick = (e, data) => {
+    console.log(data);
+    e.preventDefault();
+    if (data.state !== 'todo') {
+      setUpdateData({ ...data, state: undoState(data.state) });
+    } else {
+      deleteTodo(data.id);
+    }
+  };
 
   return (
     <Card>
       <CardHeader title={title} />
       <CardActions>
-        <FormGroup>
-          {!!cardData.length &&
-            cardData.map((data) => (
-              <FormControlLabel
-                key={data.id}
-                control={
-                  <Checkbox
-                    onChange={() => {
-                      handleChange(data);
-                    }}
-                  />
-                }
-                label={data.task}
-              />
-            ))}
-        </FormGroup>
+        <List sx={{ width: 1 }}>
+          {cardData.map((data) => (
+            <ListItem
+              button
+              divider
+              key={data.id}
+              onClick={() => handleClick(data)}
+              onContextMenu={(e) => handleRightClick(e, data)}
+            >
+              <ListItemText primary={data.task} />
+            </ListItem>
+          ))}
+        </List>
       </CardActions>
     </Card>
   );
