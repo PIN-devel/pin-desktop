@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { Grid, Fab } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import { Grid, Fab, Box, LinearProgress, Typography } from '@mui/material';
+import {
+  Add as AddIcon,
+  DeleteForever as DeleteForeverIcon,
+} from '@mui/icons-material';
 
 import { ITodo } from 'renderer/Interface/todoInterface';
 
@@ -16,6 +19,8 @@ export default function TodoListTab() {
   const [doneList, setDoneList] = useState<ITodo[]>([]);
 
   const [updateData, setUpdateData] = useState<ITodo>({});
+
+  const [progress, setProgress] = useState(0);
 
   const [open, setOpen] = useState<boolean>(false);
   const openModal = () => setOpen(true);
@@ -66,6 +71,7 @@ export default function TodoListTab() {
         console.log(result);
       });
       window.electron.ipcRenderer.updateSave(todoData);
+      setProgress((tmpDoneList.length / Object.keys(todoData).length) * 100);
     }
   }, [todoData]);
 
@@ -85,14 +91,43 @@ export default function TodoListTab() {
     });
   };
 
+  const handleDelete = () => {
+    console.log('click handleDelete');
+  };
+
   return (
-    <Grid container spacing={0.5}>
-      <Grid item xs={12}>
-        <Fab color="primary" aria-label="add" size="small" onClick={openModal}>
+    <Grid container spacing={1} sx={{ padding: 1 }}>
+      <Grid item xs={1}>
+        <Fab
+          color="secondary"
+          aria-label="add"
+          size="small"
+          onClick={openModal}
+        >
           <AddIcon />
         </Fab>
+        {/* <Fab color="error" aria-label="add" size="small" onClick={handleDelete}>
+          <DeleteForeverIcon />
+        </Fab> */}
       </Grid>
-      <Grid item xs>
+      <Grid item xs={11}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ minWidth: 35 }}>
+            <Typography variant="body2" color="text.secondary">{`${Math.round(
+              progress
+            )}%`}</Typography>
+          </Box>
+          <Box sx={{ width: '100%', mr: 1 }}>
+            <LinearProgress
+              variant="determinate"
+              value={progress}
+              color="secondary"
+              sx={{ height: 15, borderRadius: 5 }}
+            />
+          </Box>
+        </Box>
+      </Grid>
+      <Grid item xs={4}>
         <TodoListCard
           cardData={todoList}
           title="Todo"
@@ -100,7 +135,7 @@ export default function TodoListTab() {
           deleteTodo={deleteTodo}
         />
       </Grid>
-      <Grid item xs>
+      <Grid item xs={4}>
         <TodoListCard
           cardData={doingList}
           title="Doing"
@@ -108,7 +143,7 @@ export default function TodoListTab() {
           deleteTodo={deleteTodo}
         />
       </Grid>
-      <Grid item xs>
+      <Grid item xs={4}>
         <TodoListCard
           cardData={doneList}
           title="Done"
