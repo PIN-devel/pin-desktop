@@ -39,7 +39,7 @@ function TodoListInput({ open, handleClose, setUpdateData }) {
     >
       <Box sx={style}>
         <Typography id="modal-modal-title" variant="h6" component="h2">
-          Todo 추가
+          Add Todo
         </Typography>
         <TextField
           autoFocus

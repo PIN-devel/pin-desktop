@@ -112,6 +112,7 @@
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.8.2",
     "@mui/material": "^5.8.2",
+    "date-fns": "^2.29.3",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.7",
     "electron-updater": "^5.0.1",
@@ -188,8 +189,8 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "ElectronReact",
     "appId": "org.erb.ElectronReact",
+    "productName": "PIN-desktop",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [

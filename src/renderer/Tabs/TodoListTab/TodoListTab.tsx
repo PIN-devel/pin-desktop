@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { Grid, Fab, Box, LinearProgress, Typography } from '@mui/material';
-import {
-  Add as AddIcon,
-  DeleteForever as DeleteForeverIcon,
-} from '@mui/icons-material';
+import { Grid } from '@mui/material';
 
 import { ITodo } from 'renderer/Interface/todoInterface';
 
 import TodoListCard from 'renderer/Tabs/TodoListTab/TodoListCard';
 import TodoListInput from './TodoListInput';
+import TodoListHeader from './TodoListHeader';
+import DoneList from './DoneList';
 
 export default function TodoListTab() {
   const [todoData, setTodoData] = useState<{ [key: string]: ITodo }>({});
@@ -22,14 +20,27 @@ export default function TodoListTab() {
 
   const [progress, setProgress] = useState(0);
 
-  const [open, setOpen] = useState<boolean>(false);
-  const openModal = () => setOpen(true);
-  const closeModal = () => setOpen(false);
+  // Modal
+  const [openInputModal, setOpenInputModal] = useState<boolean>(false);
+  const [openDoneListModal, setOpenDoneListModal] = useState<boolean>(false);
+
+  const handleModal = (modalName, isOpen) => {
+    switch (modalName) {
+      case 'Input':
+        setOpenInputModal(isOpen);
+        break;
+      case 'DoneList':
+        setOpenDoneListModal(isOpen);
+        break;
+      default:
+        break;
+    }
+  };
 
   const handleKeyPress = useCallback((e) => {
     // console.log(e.key);
     if (e.key === ' ') {
-      openModal();
+      handleModal('Input', true);
     }
   }, []);
 
@@ -91,42 +102,10 @@ export default function TodoListTab() {
     });
   };
 
-  const handleDelete = () => {
-    console.log('click handleDelete');
-  };
-
   return (
     <Grid container spacing={1} sx={{ padding: 1 }}>
-      <Grid item xs={1}>
-        <Fab
-          color="secondary"
-          aria-label="add"
-          size="small"
-          onClick={openModal}
-        >
-          <AddIcon />
-        </Fab>
-        {/* <Fab color="error" aria-label="add" size="small" onClick={handleDelete}>
-          <DeleteForeverIcon />
-        </Fab> */}
-      </Grid>
-      <Grid item xs={11}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ minWidth: 35 }}>
-            <Typography variant="body2" color="text.secondary">{`${Math.round(
-              progress
-            )}%`}</Typography>
-          </Box>
-          <Box sx={{ width: '100%', mr: 1 }}>
-            <LinearProgress
-              variant="determinate"
-              value={progress}
-              color="secondary"
-              sx={{ height: 15, borderRadius: 5 }}
-            />
-          </Box>
-        </Box>
-      </Grid>
+      <TodoListHeader handleModal={handleModal} progress={progress} />
+
       <Grid item xs={4}>
         <TodoListCard
           cardData={todoList}
@@ -151,11 +130,17 @@ export default function TodoListTab() {
           deleteTodo={deleteTodo}
         />
       </Grid>
+      {/* modal */}
       <TodoListInput
-        open={open}
-        handleClose={closeModal}
+        open={openInputModal}
+        handleClose={() => handleModal('Input', false)}
         setUpdateData={setUpdateData}
       />
+      <DoneList
+        open={openDoneListModal}
+        handleClose={() => handleModal('DoneList', false)}
+      />
+      {/* modal end */}
     </Grid>
   );
 }
